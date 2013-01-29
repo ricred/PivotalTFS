@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -19,19 +20,15 @@ namespace PivotalTFSSync
 		{
 			InitializeComponent();
 			wizardsteps = new List<Panel>
-			              	{
-			              		pnlStep_PivotalLogin,
-			              		pnlStep_PivotalDetails,
-			              		pnlStep_TFSLogins,
-			              		pnlStep_TFSDetails,
-			              		pnlStep_Summary
-			              	};
+				{
+					pnlStep_PivotalLogin,
+					pnlStep_PivotalDetails,
+					pnlStep_TFSLogins,
+					pnlStep_TFSDetails,
+					pnlStep_Summary
+				};
 			currentStepIndex = 0;
 			InitializeAndShowStep(wizardsteps[currentStepIndex]);
-		}
-
-		private void pnlMain_Paint(object sender, PaintEventArgs e)
-		{
 		}
 
 		private void btnNext_Click(object sender, EventArgs e)
@@ -97,7 +94,7 @@ namespace PivotalTFSSync
 					}
 				case "pnlStep_TFSDetails":
 					{
-						PopulateTFSIterationsCombo(cboTFSProjects.SelectedText);
+						PopulateTfsIterationsCombo(cboTFSProjects.SelectedText);
 						break;
 					}
 				case "pnlStep_Summary":
@@ -109,11 +106,11 @@ namespace PivotalTFSSync
 			wizardstep.Show();
 		}
 
-		private void PopulateTFSIterationsCombo(string projectname)
+		private void PopulateTfsIterationsCombo(string projectname)
 		{
 			try
 			{
-				ITFS tfs = new TFS_API.TFS.TFS(txtTFSServerURL.Text, txtDomain.Text, txtTFSUsername.Text,
+				ITFS tfs = new TFS(txtTFSServerURL.Text, txtDomain.Text, txtTFSUsername.Text,
 				                               txtTFSPassword.Text);
 				cboTFSIterations.DataSource = tfs.GetIterationPaths(projectname);
 				cboTFSIterations.DisplayMember = "Name";
@@ -178,7 +175,7 @@ namespace PivotalTFSSync
 
 			foreach (var story in stories)
 			{
-				var key = story.Id.ToString();
+				var key = story.Id.ToString(CultureInfo.InvariantCulture);
 				var node = tvwDetails.Nodes.Add(key, story.Name, story.Type);
 				node.Tag = story;
 
