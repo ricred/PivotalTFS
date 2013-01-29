@@ -111,7 +111,7 @@ namespace PivotalTFSSync
 			try
 			{
 				ITFS tfs = new TFS(txtTFSServerURL.Text, txtDomain.Text, txtTFSUsername.Text,
-				                               txtTFSPassword.Text);
+				                   txtTFSPassword.Text);
 				cboTFSIterations.DataSource = tfs.GetIterationPaths(projectname);
 				cboTFSIterations.DisplayMember = "Name";
 			}

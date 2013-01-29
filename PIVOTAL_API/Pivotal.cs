@@ -43,7 +43,7 @@ namespace PIVOTAL_API
 			var storyXml = new StringBuilder();
 
 			storyXml.AppendFormat("<story><story_type>{0}</story_type><name>{1}</name><requested_by>{2}</requested_by>",
-								  pivotalstory.Type, pivotalstory.Name, pivotalstory.RequestedBy);
+			                      pivotalstory.Type, pivotalstory.Name, pivotalstory.RequestedBy);
 			if (!string.IsNullOrEmpty(pivotalstory.Description))
 			{
 				storyXml.AppendFormat("<description>{0}</description>", pivotalstory.Description);
@@ -68,12 +68,12 @@ namespace PIVOTAL_API
 
 		IEnumerable<Iteration> IPivotal.GetIteration(Project project, IterationVersion iterationToRetrieve)
 		{
-			return this.GetIteration(project.Id, iterationToRetrieve);
+			return GetIteration(project.Id, iterationToRetrieve);
 		}
 
 		public IEnumerable<Iteration> GetIteration(int projectId, IterationVersion iterationToRetrieve)
 		{
-			var iterationsfilter = Enum.GetName(typeof(IterationVersion), iterationToRetrieve).ToLower();
+			var iterationsfilter = Enum.GetName(typeof (IterationVersion), iterationToRetrieve).ToLower();
 			iterationsfilter = iterationsfilter != "all" ? string.Concat("/", iterationsfilter) : string.Empty;
 
 			var iterations =
@@ -92,8 +92,6 @@ namespace PIVOTAL_API
 			return stories.stories;
 		}
 
-		 
-
 		void IPivotal.SaveStory(Project project, Story story)
 		{
 			ValidateStoryObject(story);
@@ -101,8 +99,8 @@ namespace PIVOTAL_API
 			var serializedobject = ToXml(story);
 
 			var url = story.CreatedAt == null
-						  ? string.Concat(BaseURL, project.Id, "/stories")
-						  : string.Concat(BaseURL, project.Id, "/stories/", story.Id);
+				          ? string.Concat(BaseURL, project.Id, "/stories")
+				          : string.Concat(BaseURL, project.Id, "/stories/", story.Id);
 
 			SendResponseToServer(url, serializedobject, RequestMethodType.PUT);
 		}
@@ -119,8 +117,8 @@ namespace PIVOTAL_API
 			sb.Append("</current_state>");
 			sb.Append("<Story>");
 			var url = story.CreatedAt == null
-						 ? string.Concat(BaseURL, project.Id, "/stories")
-						 : string.Concat(BaseURL, project.Id, "/stories/", story.Id);
+				          ? string.Concat(BaseURL, project.Id, "/stories")
+				          : string.Concat(BaseURL, project.Id, "/stories/", story.Id);
 
 			SendResponseToServer(url, sb.ToString(), RequestMethodType.PUT);
 		}
@@ -150,7 +148,7 @@ namespace PIVOTAL_API
 
 		private void Login(string username, string password)
 		{
-			var request = (HttpWebRequest)WebRequest.Create(TokenURL);
+			var request = (HttpWebRequest) WebRequest.Create(TokenURL);
 
 			// Set the Method property to 'POST' to post data to the URI. 
 			request.Method = "POST";
@@ -183,7 +181,7 @@ namespace PIVOTAL_API
 
 		private string GetPivotalResponse(string url)
 		{
-			var request = (HttpWebRequest)WebRequest.Create(url);
+			var request = (HttpWebRequest) WebRequest.Create(url);
 
 			//request.Proxy = WebProxy.GetDefaultProxy();
 			request.Headers.Add("X-TrackerToken", token);
@@ -195,18 +193,18 @@ namespace PIVOTAL_API
 		private static T FromXml<T>(string xml)
 		{
 			XmlSerializer ser;
-			var fullname = string.Empty + typeof(T).FullName;
+			var fullname = string.Empty + typeof (T).FullName;
 			if (xmlserializers.ContainsKey(fullname))
 				ser = xmlserializers[fullname];
 			else
 			{
-				ser = new XmlSerializer(typeof(T));
+				ser = new XmlSerializer(typeof (T));
 				xmlserializers.Add(fullname, ser);
 			}
 
 			var stringReader = new StringReader(xml);
 			var xmlReader = new XmlTextReader(stringReader);
-			var obj = (T)ser.Deserialize(xmlReader);
+			var obj = (T) ser.Deserialize(xmlReader);
 			xmlReader.Close();
 			stringReader.Close();
 			return obj;
@@ -225,13 +223,11 @@ namespace PIVOTAL_API
 				ns.Add(string.Empty, string.Empty);
 
 				var xmlWriterSettings = new XmlWriterSettings
-											{
-												OmitXmlDeclaration = true,
-												ConformanceLevel = ConformanceLevel.Document,
-												CloseOutput = false,
-											};
-
-			
+					{
+						OmitXmlDeclaration = true,
+						ConformanceLevel = ConformanceLevel.Document,
+						CloseOutput = false,
+					};
 
 				var xmlWriter = XmlWriter.Create(memoryStream, xmlWriterSettings);
 
@@ -257,7 +253,7 @@ namespace PIVOTAL_API
 
 		private string SendResponseToServer(string url, string data, RequestMethodType type)
 		{
-			var request = (HttpWebRequest)WebRequest.Create(AppendTokenToUrl(url));
+			var request = (HttpWebRequest) WebRequest.Create(AppendTokenToUrl(url));
 
 			// Set the ContentType property. 
 			request.ContentType = "application/xml";

@@ -46,8 +46,8 @@ namespace PivotalTFSSync
 			try
 			{
 				var enumerable = pivotal.GetIteration(
-					(Project)cboPivotalProjects.SelectedItem,
-					(Pivotal.IterationVersion)cboPivotalIteration.SelectedItem);
+					(Project) cboPivotalProjects.SelectedItem,
+					(Pivotal.IterationVersion) cboPivotalIteration.SelectedItem);
 				using (var stream = File.OpenWrite(@"c:\stories.csv"))
 				{
 					var serializer2 = new StorySerializer();
@@ -59,12 +59,12 @@ namespace PivotalTFSSync
 					{
 						WriteStoriesToStream(iteration, iteration.Stories.stories, serializer, stream);
 					}
-					if (((Pivotal.IterationVersion)cboPivotalIteration.SelectedItem) ==
-						Pivotal.IterationVersion.All)
+					if (((Pivotal.IterationVersion) cboPivotalIteration.SelectedItem) ==
+					    Pivotal.IterationVersion.All)
 					{
 						var storiesByFilter =
 							pivotal.GetStoriesByFilter(
-								(Project)cboPivotalProjects.SelectedItem, "state:unscheduled");
+								(Project) cboPivotalProjects.SelectedItem, "state:unscheduled");
 						WriteStoriesToStream(null, storiesByFilter, serializer, stream);
 					}
 					stream.Close();
@@ -87,7 +87,7 @@ namespace PivotalTFSSync
 		{
 			if (numSyncInterval.Value <= 0M)
 				return;
-			tmrSync.Interval = decimal.ToInt32(numSyncInterval.Value) * 0x3e8;
+			tmrSync.Interval = decimal.ToInt32(numSyncInterval.Value)*0x3e8;
 			ToggleSyncText();
 			tmrSync.Enabled = !tmrSync.Enabled;
 		}
@@ -107,7 +107,7 @@ namespace PivotalTFSSync
 		{
 			if (cboTFSIterations.SelectedItem == null)
 				return;
-			cboTFSSubPath.DataSource = ((Node)cboTFSIterations.SelectedItem).ChildNodes;
+			cboTFSSubPath.DataSource = ((Node) cboTFSIterations.SelectedItem).ChildNodes;
 			cboTFSSubPath.DisplayMember = "Name";
 		}
 
@@ -116,7 +116,7 @@ namespace PivotalTFSSync
 			if (cboTFSProjects.SelectedItem == null)
 				return;
 			PopulateTFSIterationsCombo(
-				((Microsoft.TeamFoundation.WorkItemTracking.Client.Project)cboTFSProjects.SelectedItem).Name);
+				((Microsoft.TeamFoundation.WorkItemTracking.Client.Project) cboTFSProjects.SelectedItem).Name);
 		}
 
 		private void cboTFSSubPath_DropDownClosed(object sender, EventArgs e)
@@ -126,8 +126,8 @@ namespace PivotalTFSSync
 			try
 			{
 				TFS.GetNextPriorityNumberAndPriorityStep(cboTFSProjects.Text, cboTFSIterations.Text,
-														 cboTFSSubPath.Text, out nextPriority,
-														 out priorityStep);
+				                                         cboTFSSubPath.Text, out nextPriority,
+				                                         out priorityStep);
 			}
 			catch (Exception exception)
 			{
@@ -136,10 +136,6 @@ namespace PivotalTFSSync
 			txtPriorityStep.Text = priorityStep.ToString();
 			txtStartPriority.Text = nextPriority.ToString();
 			PopulateTFSWorkItemList();
-		}
-
-		private void cboTFSSubPath_Enter(object sender, EventArgs e)
-		{
 		}
 
 		private void ConnectToPivotalAndPopulateData()
@@ -166,9 +162,8 @@ namespace PivotalTFSSync
 			try
 			{
 				TFS = new TFS2010(txtTFSServerURL.Text, txtDomain.Text,
-								  txtTFSUsername.Text, txtTFSPassword.Text);
-
-				}
+				                  txtTFSUsername.Text, txtTFSPassword.Text);
+			}
 			catch (Exception exception)
 			{
 				LogError(exception);
@@ -193,24 +188,21 @@ namespace PivotalTFSSync
 		private IEnumerable<TreeNode> GetCheckedTreeNodes()
 		{
 			return
-				tvwDetails.Nodes.Cast<TreeNode>().Where(delegate(TreeNode node)
-			{
-				return node.Checked;
-			});
+				tvwDetails.Nodes.Cast<TreeNode>().Where(delegate(TreeNode node) { return node.Checked; });
 		}
 
 		private static int GetPivotalIdFromTFSWorkItem(WorkItem item)
 		{
 			int num;
-			var originalValue = (string)item.Fields["History"].Value;
+			var originalValue = (string) item.Fields["History"].Value;
 			if (originalValue == string.Empty)
 			{
-				originalValue = (string)item.Fields["History"].OriginalValue;
+				originalValue = (string) item.Fields["History"].OriginalValue;
 			}
 
-			if ((!string.IsNullOrEmpty(originalValue) && originalValue.Contains("PIVOTALID:")) &&
-				int.TryParse(
-					originalValue.Substring(originalValue.IndexOf("PIVOTALID:") + "PIVOTALID:".Length).Replace(":", ""), out num))
+			if ((!string.IsNullOrEmpty(originalValue) && originalValue.Contains(PIVOTALID)) &&
+			    int.TryParse(
+				    originalValue.Substring(originalValue.IndexOf(PIVOTALID) + PIVOTALID.Length).Replace(":", ""), out num))
 			{
 				return num;
 			}
@@ -234,9 +226,9 @@ namespace PivotalTFSSync
 
 				return
 					hyperlinks.Where(hyperlink => hyperlink.Comment == "Link to pivotal story.").Select(hyperlink => hyperlink.Location)
-						.FirstOrDefault();
+					          .FirstOrDefault();
 			}
-				return null;
+			return null;
 		}
 
 		private IEnumerable<Story> GetPivotalStories()
@@ -244,9 +236,9 @@ namespace PivotalTFSSync
 			Cursor = Cursors.WaitCursor;
 			try
 			{
-				return pivotal.GetIteration((Project)cboPivotalProjects.SelectedItem,
-											(Pivotal.IterationVersion)
-											cboPivotalIteration.SelectedItem).First().Stories.stories;
+				return pivotal.GetIteration((Project) cboPivotalProjects.SelectedItem,
+				                            (Pivotal.IterationVersion)
+				                            cboPivotalIteration.SelectedItem).First().Stories.stories;
 			}
 			catch (Exception exception)
 			{
@@ -259,7 +251,6 @@ namespace PivotalTFSSync
 			return new Story[0];
 		}
 
-		
 		private static bool IsChildNode(TreeNode node)
 		{
 			return (node.Parent != null);
@@ -393,7 +384,7 @@ namespace PivotalTFSSync
 			tvwTFS.Nodes.Clear();
 			var workItemTypes = TFS.GetWorkItemTypes(cboTFSProjects.Text);
 			var items = TFS.GetWorkItems(cboTFSProjects.Text, cboTFSIterations.Text,
-										 cboTFSSubPath.Text, workItemTypes["Product Backlog Item"], -1);
+			                             cboTFSSubPath.Text, workItemTypes["Product Backlog Item"], -1);
 			if (items == null)
 				return;
 
@@ -411,6 +402,9 @@ namespace PivotalTFSSync
 		private void PopulateTreeview(IEnumerable<Story> stories)
 		{
 			tvwDetails.Nodes.Clear();
+			if (stories == null)
+				return;
+
 			foreach (var story in stories)
 			{
 				var key = story.Id.ToString();
@@ -470,18 +464,18 @@ namespace PivotalTFSSync
 				var num = int.Parse(txtStartPriority.Text);
 				var num2 = int.Parse(txtPriorityStep.Text);
 				var name =
-					((Microsoft.TeamFoundation.WorkItemTracking.Client.Project)cboTFSProjects.SelectedItem).Name;
+					((Microsoft.TeamFoundation.WorkItemTracking.Client.Project) cboTFSProjects.SelectedItem).Name;
 				var checkedTreeNodes = GetCheckedTreeNodes();
 				var num3 = 1;
 				var extraTasksToAdd = GetExtraTasksToAdd();
 				foreach (var node in checkedTreeNodes)
 				{
 					progress.SetMessage(string.Format("Copying item {0} of {1}", num3,
-													  checkedTreeNodes.Count()));
-					var tag = (Story)node.Tag;
+					                                  checkedTreeNodes.Count()));
+					var tag = (Story) node.Tag;
 					tag.Priority = num;
-					TFS.AddPivotalStoryToTFS(tag, name, ((Node)cboTFSIterations.SelectedItem).Name,
-											 ((Node)cboTFSSubPath.SelectedItem).Name, extraTasksToAdd, chkKopieraPiovtalTasks.Checked);
+					TFS.AddPivotalStoryToTFS(tag, name, ((Node) cboTFSIterations.SelectedItem).Name,
+					                         ((Node) cboTFSSubPath.SelectedItem).Name, extraTasksToAdd, chkKopieraPiovtalTasks.Checked);
 					num += num2;
 					num3++;
 				}
@@ -496,11 +490,11 @@ namespace PivotalTFSSync
 		private IEnumerable<Story> GetExtraTasksToAdd()
 		{
 			return from object defaulttask in chklstDefaultTasks.CheckedItems
-				   select new Story
-							{
-								Description = defaulttask.ToString(),
-								Name = defaulttask.ToString()
-							};
+			       select new Story
+				       {
+					       Description = defaulttask.ToString(),
+					       Name = defaulttask.ToString()
+				       };
 		}
 
 		private void SyncStatuses()
@@ -512,8 +506,8 @@ namespace PivotalTFSSync
 				Monitor.Enter(dictionary);
 				var workItemTypes = TFS.GetWorkItemTypes(cboTFSProjects.Text);
 				var tfsWorkItems = TFS.GetWorkItems(cboTFSProjects.Text, cboTFSIterations.Text,
-													cboTFSSubPath.Text, workItemTypes["Product Backlog Item"],
-													-1);
+				                                    cboTFSSubPath.Text, workItemTypes["Product Backlog Item"],
+				                                    -1);
 				switch (cboSyncDirection.SelectedIndex)
 				{
 					case 0:
@@ -532,9 +526,8 @@ namespace PivotalTFSSync
 		}
 
 		private void SyncTFSWorkItemStatusesToPivotal(IDictionary<int, Story> pivotalStoriesdictionary,
-													  IEnumerable tfsWorkItems)
+		                                              IEnumerable tfsWorkItems)
 		{
-		
 			foreach (WorkItem workItem in tfsWorkItems)
 			{
 				var pivotalId = GetPivotalIdFromTFSWorkItem(workItem);
@@ -546,7 +539,7 @@ namespace PivotalTFSSync
 
 				var pivotalstory = pivotalStoriesdictionary[pivotalId];
 				if (SetPivotalStatus(pivotalstory, workItem))
-					pivotal.UpdatePivotalStoryStatus((Project)cboPivotalProjects.SelectedItem, pivotalstory);
+					pivotal.UpdatePivotalStoryStatus((Project) cboPivotalProjects.SelectedItem, pivotalstory);
 			}
 		}
 
@@ -568,10 +561,9 @@ namespace PivotalTFSSync
 			btnSync.Text = (btnSync.Text == "Stop Sync") ? "Start Sync" : "Stop Sync";
 		}
 
-	
 		private void tvwDetails_MouseDown(object sender, MouseEventArgs e)
 		{
-			var view = (TreeView)sender;
+			var view = (TreeView) sender;
 			var nodeAt = view.GetNodeAt(e.X, e.Y);
 			view.SelectedNode = nodeAt;
 			if (nodeAt != null)
@@ -582,44 +574,44 @@ namespace PivotalTFSSync
 
 		private void tvwTFS_DragDrop(object sender, DragEventArgs e)
 		{
-			var view = (TreeView)sender;
+			var view = (TreeView) sender;
 			var p = new Point(e.X, e.Y);
 			p = view.PointToClient(p);
 			var nodeAt = view.GetNodeAt(p);
-			var tag = (WorkItem)nodeAt.Tag;
-			var item2 = (WorkItem)nodeAt.NextNode.Tag;
+			var tag = (WorkItem) nodeAt.Tag;
+			var item2 = (WorkItem) nodeAt.NextNode.Tag;
 			var num =
 				Math.Abs(
-					((int)item2.Fields["Conchango.TeamSystem.Scrum.BusinessPriority"].Value) -
-					((int)tag.Fields["Conchango.TeamSystem.Scrum.BusinessPriority"].Value));
+					((int) item2.Fields["Conchango.TeamSystem.Scrum.BusinessPriority"].Value) -
+					((int) tag.Fields["Conchango.TeamSystem.Scrum.BusinessPriority"].Value));
 			if (num < 2)
 			{
 				num = 2;
 			}
-			var num2 = ((int)tag.Fields["Conchango.TeamSystem.Scrum.BusinessPriority"].Value) + (num / 2);
-			if (((TreeNode)e.Data.GetData("System.Windows.Forms.TreeNode")).Tag.GetType().Name.Equals("WorkItem"))
+			var num2 = ((int) tag.Fields["Conchango.TeamSystem.Scrum.BusinessPriority"].Value) + (num/2);
+			if (((TreeNode) e.Data.GetData("System.Windows.Forms.TreeNode")).Tag.GetType().Name.Equals("WorkItem"))
 			{
-				var workitem = (WorkItem)((TreeNode)e.Data.GetData("System.Windows.Forms.TreeNode")).Tag;
+				var workitem = (WorkItem) ((TreeNode) e.Data.GetData("System.Windows.Forms.TreeNode")).Tag;
 				workitem.Fields["Conchango.TeamSystem.Scrum.BusinessPriority"].Value = num2;
 				workitem.Fields["Conchango.TeamSystem.Scrum.DeliveryOrder"].Value = num2;
 				TFS.UpdateWorkItem(workitem);
 			}
 			else
 			{
-				var pivotalStoryToAdd = (Story)((TreeNode)e.Data.GetData("System.Windows.Forms.TreeNode")).Tag;
+				var pivotalStoryToAdd = (Story) ((TreeNode) e.Data.GetData("System.Windows.Forms.TreeNode")).Tag;
 				pivotalStoryToAdd.Priority = num2;
 				TFS.AddPivotalStoryToTFS(pivotalStoryToAdd, cboTFSProjects.Text, cboTFSIterations.Text,
-										 cboTFSSubPath.Text, GetExtraTasksToAdd(), chkKopieraPiovtalTasks.Checked);
+				                         cboTFSSubPath.Text, GetExtraTasksToAdd(), chkKopieraPiovtalTasks.Checked);
 			}
 			PopulateTFSWorkItemList();
 		}
 
 		private void tvwTFS_DragOver(object sender, DragEventArgs e)
 		{
-			var view = (TreeView)sender;
+			var view = (TreeView) sender;
 			var effect = e.Effect;
 			e.Effect = DragDropEffects.None;
-			if (e.Data.GetData(typeof(TreeNode)) == null)
+			if (e.Data.GetData(typeof (TreeNode)) == null)
 				return;
 			var p = new Point(e.X, e.Y);
 			p = view.PointToClient(p);
@@ -632,7 +624,7 @@ namespace PivotalTFSSync
 
 		private void tvwTFS_MouseDown(object sender, MouseEventArgs e)
 		{
-			var view = (TreeView)sender;
+			var view = (TreeView) sender;
 			var nodeAt = view.GetNodeAt(e.X, e.Y);
 			view.SelectedNode = nodeAt;
 			if (nodeAt != null)
@@ -651,7 +643,7 @@ namespace PivotalTFSSync
 			try
 			{
 				pivotal = new Pivotal(txtPivotalUsername.Text,
-									  txtPivotalPassword.Text);
+				                      txtPivotalPassword.Text);
 				return true;
 			}
 			catch (Exception exception)
@@ -662,7 +654,7 @@ namespace PivotalTFSSync
 		}
 
 		private static void WriteStoriesToStream(Iteration iteration, IEnumerable<Story> stories,
-												 StorySerializer serializer, FileStream tempFileStream)
+		                                         StorySerializer serializer, FileStream tempFileStream)
 		{
 			int num;
 			serializer.Iteration = iteration;
@@ -713,9 +705,9 @@ namespace PivotalTFSSync
 		{
 			const string separator = "\t";
 			return string.Concat(workItem.BacklogItem.Type.Name, separator, GetPivotalIdFromTFSWorkItem(workItem.BacklogItem),
-								 separator, GetPivotalUrlFromTFSWorkItem(workItem.BacklogItem), separator,
-								 workItem.BacklogItem.Title, separator,
-								 workItem.BacklogItem.IterationPath, separator, workItem.ChangedBy);
+			                     separator, GetPivotalUrlFromTFSWorkItem(workItem.BacklogItem), separator,
+			                     workItem.BacklogItem.Title, separator,
+			                     workItem.BacklogItem.IterationPath, separator, workItem.ChangedBy);
 		}
 
 		private void chklstDefaultTasks_MouseDoubleClick(object sender, MouseEventArgs e)
@@ -729,14 +721,42 @@ namespace PivotalTFSSync
 			chklstDefaultTasks.Refresh();
 		}
 
+		private void btnAddPivotalId_Click(object sender, EventArgs e)
+		{
+			var workitems = TFS.GetWorkItemsWithoutPivotalIds(cboTFSProjects.Text);
+
+			foreach (var workItem in workitems.Where(q => q.Title.Length > 0))
+			{
+				var pivotalstory = GetPivotalStoryViaTitle(workItem.Title);
+				if (pivotalstory == null)
+					continue;
+
+				var hp = new Hyperlink(pivotalstory.URL)
+					{
+						Comment = "Link to pivotal story."
+					};
+				workItem.Links.Add(hp);
+				workItem.Save();
+			}
+		}
+
+		private Story GetPivotalStoryViaTitle(string title)
+		{
+			if (string.IsNullOrEmpty(title) || title.Contains(":"))
+				return null;
+
+			var story = pivotal.GetStoriesByFilter((Project) cboPivotalProjects.SelectedItem, string.Format("includedone:true name:\"{0}\"", HttpUtility.UrlEncode(title)));
+			return story != null ? story.FirstOrDefault() : null;
+		}
+
 		private class NodeSorter : IComparer
 		{
 			#region IComparer Members
 
 			public int Compare(object x, object y)
 			{
-				var node = (TreeNode)x;
-				var node2 = (TreeNode)y;
+				var node = (TreeNode) x;
+				var node2 = (TreeNode) y;
 				var tag = node.Tag as WorkItem;
 				var item2 = node2.Tag as WorkItem;
 				if (item2 != null)
@@ -766,35 +786,6 @@ namespace PivotalTFSSync
 			}
 
 			#endregion
-		}
-
-		private void btnAddPivotalId_Click(object sender, EventArgs e)
-		{
-			var workitems = TFS.GetWorkItemsWithoutPivotalIds(cboTFSProjects.Text);
-
-			foreach (var workItem in workitems.Where(q => q.Title.Length > 0))
-			{
-				var pivotalstory = GetPivotalStoryViaTitle(workItem.Title);
-				if (pivotalstory == null)
-					continue;
-
-				var hp = new Hyperlink(pivotalstory.URL)
-							{
-								Comment = "Link to pivotal story."
-							};
-				workItem.Links.Add(hp);
-				workItem.Save();
-			}
-
-		}
-
-		private Story GetPivotalStoryViaTitle(string title)
-		{
-			if (string.IsNullOrEmpty(title) || title.Contains(":"))
-				return null;
-
-			var story = pivotal.GetStoriesByFilter((Project)cboPivotalProjects.SelectedItem, string.Format("includedone:true name:\"{0}\"", HttpUtility.UrlEncode(title)));
-			return story != null ? story.FirstOrDefault() : null;
 		}
 	}
 }

@@ -80,8 +80,8 @@ namespace PivotalTFSSync.Serializers
 					if (lineTokens.Length != NumberOfColumns)
 						throw new ArgumentOutOfRangeException("sourceStream", lineTokens.Length,
 						                                      string.Format(
-						                                      	"Ogiltigt antal kolumnvärden i filen på rad {0}. Förväntade {1} men är {2}",
-						                                      	radnummer, NumberOfColumns, lineTokens.Length));
+							                                      "Ogiltigt antal kolumnvärden i filen på rad {0}. Förväntade {1} men är {2}",
+							                                      radnummer, NumberOfColumns, lineTokens.Length));
 
 					T element;
 
@@ -180,7 +180,7 @@ namespace PivotalTFSSync.Serializers
 
 		private class IntermediateSerializer : CsvSerializer<string[]>
 		{
-			private int numberOfColumns;
+			private readonly int numberOfColumns;
 
 			public IntermediateSerializer(int numberOfColumns, char rowDelimiter, char columnDelimiter,
 			                              bool useExplicitHeaderRow, bool useNewLineAsRowDelimiter, Encoding encoding)
@@ -211,13 +211,13 @@ namespace PivotalTFSSync.Serializers
 
 		private class SerializingStream : Stream
 		{
+			private readonly IEnumerator<T> enumerator;
+			private readonly Action onFinishedAction;
+			private readonly CsvSerializer<T> serializer;
 			private byte[] buffer;
 			private int bufferOffset;
-			private IEnumerator<T> enumerator;
 			private bool hasSerializedExplicitHeader;
-			private Action onFinishedAction;
 			private long position;
-			private CsvSerializer<T> serializer;
 
 			public SerializingStream(CsvSerializer<T> serializer, IEnumerator<T> enumerator, Action onFinishedAction)
 			{

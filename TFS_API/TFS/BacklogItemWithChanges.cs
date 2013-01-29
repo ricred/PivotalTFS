@@ -4,16 +4,8 @@ namespace TFS_API.TFS
 {
 	public class BacklogItemWithChanges
 	{
-		public WorkItem  BacklogItem
-		{
-			get;
-			set;
-		}
+		public WorkItem BacklogItem { get; set; }
 
-		public string ChangedBy
-		{
-			get;
-			set;
-		}
+		public string ChangedBy { get; set; }
 	}
 }

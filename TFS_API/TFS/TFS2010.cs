@@ -18,11 +18,11 @@ namespace TFS_API.TFS
 		private const string Pivotalid = "PIVOTALID:";
 		private const string ProductBacklogItem = "Product Backlog Item";
 		private const string HistoryField = "History";
+		private const string SprintBacklogItem = "Sprint Backlog Item";
 		private readonly WorkItemStore store;
 		// private readonly TfsConfigurationServer tfsConfigurationServer;
-		private TemplateProxy templateproxy = new TemplateProxy();
-		private TfsTeamProjectCollection tfsTeamProjectCollection;
-		private static string SprintBacklogItem = "Sprint Backlog Item";
+		private readonly TemplateProxy templateproxy = new TemplateProxy();
+		private readonly TfsTeamProjectCollection tfsTeamProjectCollection;
 
 		public TFS2010(string servername, string domain, string username, string password)
 		{
@@ -35,44 +35,10 @@ namespace TFS_API.TFS
 			if (string.IsNullOrEmpty(password))
 				throw new ArgumentException("Parameter named:password cannot be null or empty.");
 
-			//ICredentialsProvider provider = new UICredentialsProvider();
-			//tfsConfigurationServer = TeamFoundationServerFactory.GetServer(serverName, provider);
-			//if (!tfsConfigurationServer.HasAuthenticated)
-			//    tfsConfigurationServer.Authenticate();
-
-			//tfsConfigurationServer = new TfsConfigurationServer(new Uri(string.Concat("http://", servername)),
-			//                                                    new NetworkCredential(username, password, domain));
-
-			//TeamProjectPicker pp = new TeamProjectPicker(TeamProjectPickerMode.SingleProject, false);
-
-			//pp.ShowDialog();
-
-			//var coll = new TfsTeamProjectCollection(new Uri(string.Concat("http://", servername)), new UICredentialsProvider());
 			tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Concat("http://", servername)),
-																	new NetworkCredential(username, password, domain));
+			                                                        new NetworkCredential(username, password, domain));
 			tfsTeamProjectCollection.EnsureAuthenticated();
-			store = (WorkItemStore)tfsTeamProjectCollection.GetService(typeof(WorkItemStore));
-
-			//var processTemplates = (IProcessTemplates)tfsTeamProjectCollection.GetService(typeof(IProcessTemplates));
-			//var node = processTemplates.GetTemplateNames();
-
-			//ICommonStructureService css = (ICommonStructureService)tfsTeamProjectCollection.GetService(typeof(ICommonStructureService));
-			//ProjectInfo projectInfo = css.GetProjectFromName(store.Projects[5].Name);
-			//String projectName;
-			//String prjState;
-			//int templateId = 0;
-			//ProjectProperty[] projectProperties;
-
-			//css.GetProjectProperties(
-			//        projectInfo.Uri, out projectName, out prjState, out templateId, out projectProperties);
-
-			// //tfsConfigurationServer.Authenticate();
-			// var tpcService = tfsConfigurationServer.GetService<ITeamProjectCollectionService>();
-			//var  collections = tpcService.GetCollections();
-			// //var wstore= ((TfsTeamProjectCollection )collections[0]).GetService(typeof (WorkItemStore));
-			// var ws=tpcService.GetServicingOperation("WorkItemStore");
-
-			// store = (WorkItemStore) tfsConfigurationServer.GetService(typeof (WorkItemStore));
+			store = (WorkItemStore) tfsTeamProjectCollection.GetService(typeof (WorkItemStore));
 		}
 
 		#region ITFS Members
@@ -92,16 +58,15 @@ namespace TFS_API.TFS
 
 		public void AddPivotalStoryToTFS(Story pivotalStoryToAdd, string projectname, string iterationPath, string subPath, IEnumerable<Story> additionalDefaultTask, bool kopieraÄvenPiovtalTasks)
 		{
-
 			var workItemTypes = store.Projects[projectname].WorkItemTypes;
 
 			var existingworkingItem = GetTFSBacklogItemByPivotalId(projectname, iterationPath, subPath,
-																   pivotalStoryToAdd.Id);
+			                                                       pivotalStoryToAdd.Id);
 			if (existingworkingItem != null)
 			{
 				existingworkingItem.Title = pivotalStoryToAdd.Name;
 				existingworkingItem.Description = string.Concat(pivotalStoryToAdd.URL, Environment.NewLine,
-																pivotalStoryToAdd.Description);
+				                                                pivotalStoryToAdd.Description);
 				existingworkingItem.Save();
 				return;
 			}
@@ -116,7 +81,7 @@ namespace TFS_API.TFS
 			templateproxy.CopyPivotalStoryValuesToWorkItem(pivotalStoryToAdd, workItem);
 
 			workItem.Description = string.Concat(pivotalStoryToAdd.URL, Environment.NewLine,
-												 pivotalStoryToAdd.Description);
+			                                     pivotalStoryToAdd.Description);
 			workItem.Title = pivotalStoryToAdd.Name;
 			workItem.IterationPath = string.Concat(projectname, "\\", iterationPath, "\\", subPath);
 			workItem.Fields[HistoryField].Value = string.Concat(Pivotalid, pivotalStoryToAdd.Id, ":");
@@ -125,11 +90,10 @@ namespace TFS_API.TFS
 			//Link most be valid!
 			if (pivotalStoryToAdd.URL != null)
 			{
-
 				var hp = new Hyperlink(pivotalStoryToAdd.URL)
-				{
-					Comment = "Link to pivotal story."
-				};
+					{
+						Comment = "Link to pivotal story."
+					};
 				workItem.Links.Add(hp);
 			}
 
@@ -140,7 +104,7 @@ namespace TFS_API.TFS
 			}
 
 			//Add additional tasks.
-			if (additionalDefaultTask!=null)
+			if (additionalDefaultTask != null)
 				AddAdditionalTasks(workItemTypes, workItem, additionalDefaultTask);
 
 			//Add Attachment
@@ -167,22 +131,6 @@ namespace TFS_API.TFS
 				return;
 			}
 			workItem.Save();
-
-		}
-
-		private static void AddAdditionalTasks(WorkItemTypeCollection workItemTypes, WorkItem parentWorkItem, IEnumerable<Story> additionalTaskTitles)
-		{
-			foreach (var workitemTask in additionalTaskTitles.Select(story => new WorkItem(workItemTypes[SprintBacklogItem])
-																					{
-																						Title = story.Name,
-																						Description = story.Description,
-																						IterationPath = parentWorkItem.IterationPath
-																					}))
-			{
-				workitemTask.Fields[HistoryField].Value = parentWorkItem.Fields[HistoryField].Value;
-				workitemTask.Save();
-				parentWorkItem.Links.Add(new RelatedLink(workitemTask.Id));
-			}
 		}
 
 		public bool DeletePivotalStoryFromTFS(Story storyToDelete, string projectname, string iterationPath)
@@ -194,10 +142,10 @@ namespace TFS_API.TFS
 					store.Projects[projectname].IterationRootNodes[iterationPath].ChildNodes.GetEnumerator();
 				while (nodes.MoveNext())
 				{
-					if (!((WorkItem)nodes.Current).History.Contains(string.Concat(Pivotalid, storyToDelete.Id)))
+					if (!((WorkItem) nodes.Current).History.Contains(string.Concat(Pivotalid, storyToDelete.Id)))
 						continue;
 
-					var workitem = ((WorkItem)nodes.Current);
+					var workitem = ((WorkItem) nodes.Current);
 					if (workitem == null)
 						continue;
 
@@ -209,15 +157,6 @@ namespace TFS_API.TFS
 			}
 			return false;
 		}
-
-		//public void AddPivotalStoryToTFS(Story pivotalStoryToAdd, string projectname, string iterationPath,
-		//                                 string subPath)
-		//{
-
-		//    AddPivotalStoryToTFS(pivotalStoryToAdd, projectname, iterationPath, subPath, null, false);
-
-
-		//}
 
 		public ProjectCollection GetProjects()
 		{
@@ -233,7 +172,7 @@ namespace TFS_API.TFS
 		}
 
 		public void GetNextPriorityNumberAndPriorityStep(string projectname, string iterationPath, string subPath,
-														 out int nextPriority, out int priorityStep)
+		                                                 out int nextPriority, out int priorityStep)
 		{
 			priorityStep = 10;
 			var workItemTypes = store.Projects[projectname].WorkItemTypes;
@@ -303,7 +242,7 @@ namespace TFS_API.TFS
 		}
 
 		public WorkItemCollection GetWorkItems(string projectname, string iterationPath, string subPath,
-											   WorkItemType workitemtype, int forSpecificBacklogItemId)
+		                                       WorkItemType workitemtype, int forSpecificBacklogItemId)
 		{
 			var completeiterationpath = string.Concat(projectname, "\\", iterationPath, "\\", subPath);
 			if (forSpecificBacklogItemId < 0)
@@ -332,33 +271,30 @@ namespace TFS_API.TFS
 			//  throw new NotImplementedException();
 		}
 
-		#endregion
-
-		private static void AddPivotalTasksAsLinkedWorkItems(WorkItemTypeCollection workItemTypes, WorkItem workItem,
-															 Story pivotalStoryToAdd)
+		private static void AddAdditionalTasks(WorkItemTypeCollection workItemTypes, WorkItem parentWorkItem, IEnumerable<Story> additionalTaskTitles)
 		{
-			if (pivotalStoryToAdd.Tasks == null)
-				return;
-			foreach (var task in pivotalStoryToAdd.Tasks.tasks)
+			foreach (var workitemTask in additionalTaskTitles.Select(story => new WorkItem(workItemTypes[SprintBacklogItem])
+				{
+					Title = story.Name,
+					Description = story.Description,
+					IterationPath = parentWorkItem.IterationPath
+				}))
 			{
-				var workitemTask = new WorkItem(workItemTypes[SprintBacklogItem])
-									{
-										Title = task.Description,
-										IterationPath = workItem.IterationPath
-									};
-				workitemTask.Fields[HistoryField].Value = workItem.Fields[HistoryField].Value;
+				workitemTask.Fields[HistoryField].Value = parentWorkItem.Fields[HistoryField].Value;
 				workitemTask.Save();
-				workItem.Links.Add(new RelatedLink(workitemTask.Id));
+				parentWorkItem.Links.Add(new RelatedLink(workitemTask.Id));
 			}
 		}
+
+		#endregion
 
 		public IEnumerable<BacklogItemWithChanges> GetWorkItemsWithCodechanges(string projectname, DateTime fromdate, DateTime todate)
 		{
 			var workitems =
-			store.Query(
-				string.Format(
-					"SELECT * FROM WorkItems WHERE [System.TeamProject] = '{0}' AND [System.ChangedDate]>='{1}' AND [System.ChangedDate]<='{2}'",
-					projectname, fromdate.ToShortDateString(), todate.ToShortDateString())).OfType<WorkItem>();
+				store.Query(
+					string.Format(
+						"SELECT * FROM WorkItems WHERE [System.TeamProject] = '{0}' AND [System.ChangedDate]>='{1}' AND [System.ChangedDate]<='{2}'",
+						projectname, fromdate.ToShortDateString(), todate.ToShortDateString())).OfType<WorkItem>();
 			var versionControlServer = tfsTeamProjectCollection.GetService<VersionControlServer>();
 			var artifactProvider = versionControlServer.ArtifactProvider;
 
@@ -375,38 +311,50 @@ namespace TFS_API.TFS
 				var names = GetNamesOfPersons(changesets);
 
 				var relatedlink = (from related in workitem.Links.OfType<RelatedLink>()
-								   where related.GetType() == typeof(RelatedLink)
-								   select related).FirstOrDefault();
+				                   where related.GetType() == typeof (RelatedLink)
+				                   select related).FirstOrDefault();
 
 				var backlogItem = relatedlink == null ? workitem : store.GetWorkItem(relatedlink.RelatedWorkItemId);
 
 				if (!ContainsBacklogItemId(workitemsWithChangesets, backlogItem.Id))
 					workitemsWithChangesets.Add(new BacklogItemWithChanges
-													{
-														BacklogItem = backlogItem,
-														ChangedBy = names
-													});
+						{
+							BacklogItem = backlogItem,
+							ChangedBy = names
+						});
 			}
 			return workitemsWithChangesets;
 		}
 
 		public IEnumerable<WorkItem> GetWorkItemsWithoutPivotalIds(string projectname)
 		{
-			//var workitems =store.Query(string.Format("SELECT * FROM WorkItems WHERE [System.TeamProject] = '{0}'",projectname)).OfType<WorkItem>();
-
-			//var workitemsWithoutPivotalIds = from ws in workitems where ws.Links[0].ArtifactLinkType.Name != "Hyperlink" select ws;
-			//return workitemsWithoutPivotalIds;
-
 			return store.Query(
-				   string.Format(
-					   "SELECT * FROM WorkItems WHERE [System.TeamProject] = '{0}' AND  [System.History] not contains '%PIVOTALID:%'",
-					   projectname)).OfType<WorkItem>();
+				string.Format(
+					"SELECT * FROM WorkItems WHERE [System.TeamProject] = '{0}' AND  [System.History] not contains '%PIVOTALID:%'",
+					projectname)).OfType<WorkItem>();
+		}
 
+		private static void AddPivotalTasksAsLinkedWorkItems(WorkItemTypeCollection workItemTypes, WorkItem workItem,
+		                                                     Story pivotalStoryToAdd)
+		{
+			if (pivotalStoryToAdd.Tasks == null)
+				return;
+			foreach (var task in pivotalStoryToAdd.Tasks.tasks)
+			{
+				var workitemTask = new WorkItem(workItemTypes[SprintBacklogItem])
+					{
+						Title = task.Description,
+						IterationPath = workItem.IterationPath
+					};
+				workitemTask.Fields[HistoryField].Value = workItem.Fields[HistoryField].Value;
+				workitemTask.Save();
+				workItem.Links.Add(new RelatedLink(workitemTask.Id));
+			}
 		}
 
 		private static bool ContainsBacklogItemId(IEnumerable<BacklogItemWithChanges> workitemsWithChangesets, int id)
 		{
-			return workitemsWithChangesets.Where(q => q.BacklogItem.Id == id).Count() > 0;
+			return workitemsWithChangesets.Any(q => q.BacklogItem.Id == id);
 		}
 
 		private static string GetNamesOfPersons(IEnumerable<Changeset> changesets)
@@ -428,8 +376,8 @@ namespace TFS_API.TFS
 		private void DumpAllWorkItems(IEnumerable workitems)
 		{
 			foreach (var field in from WorkItem item in workitems
-								  from Field field in item.Fields
-								  select field)
+			                      from Field field in item.Fields
+			                      select field)
 			{
 				Console.Write(field.Id);
 				Console.Write(":");
@@ -467,12 +415,10 @@ namespace TFS_API.TFS
 				else
 					field = wrk.Fields[vstsBusinessPriority];
 				val = int.Parse(field.Value.ToString());
-				return;
 			}
 			catch (Exception)
 			{
 				val = -1;
-				return;
 			}
 		}
 	}

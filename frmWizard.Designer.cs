@@ -98,7 +98,6 @@
 			this.pnlMain.Name = "pnlMain";
 			this.pnlMain.Size = new System.Drawing.Size(618, 572);
 			this.pnlMain.TabIndex = 0;
-			this.pnlMain.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlMain_Paint);
 			// 
 			// pnlStep_Summary
 			// 
