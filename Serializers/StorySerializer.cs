@@ -1,5 +1,6 @@
 ﻿using System;
 using PIVOTAL_API;
+using PivotalTFS_GENERAL;
 
 namespace PivotalTFSSync.Serializers
 {

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Windows.Forms;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using PIVOTAL_API;
+using PivotalTFS_GENERAL;
 using TFS_API.TFS;
-using Project = PIVOTAL_API.Project;
+using Project = PivotalTFS_GENERAL.Project;
 
 namespace PivotalTFSSync
 {

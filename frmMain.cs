@@ -12,9 +12,9 @@ using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using PIVOTAL_API;
 using PivotalTFSSync.Properties;
 using PivotalTFSSync.Serializers;
+using PivotalTFS_GENERAL;
 using TFS_API.TFS;
-using Project = PIVOTAL_API.Project;
-using Story = PIVOTAL_API.Story;
+using Project = PivotalTFS_GENERAL.Project;
 
 namespace PivotalTFSSync
 {

@@ -204,17 +204,21 @@
     <None Include="Resources\leftarrow.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PIVOTAL_API\PIVOTAL_API.csproj">
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="PivotalTFS_GENERAL\PivotalTFS_GENERAL.csproj">
+      <Project>{DB13E3AB-2DF0-41FA-AFEE-0F4ABE604AA1}</Project>
+      <Name>PivotalTFS_GENERAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="PIVOTAL_API\PIVOTAL_API.csproj">
       <Project>{2CC64D68-AC92-4025-AF7D-137243A713C4}</Project>
       <Name>PIVOTAL_API</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TFS_API\TFS_API.csproj">
+    <ProjectReference Include="TFS_API\TFS_API.csproj">
       <Project>{C4738F74-B66A-4F49-8654-24E9C0D4C1E9}</Project>
       <Name>TFS_API</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
