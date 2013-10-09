@@ -8,9 +8,7 @@ namespace TFS_API.TFS.Templates
 		private const string microsoftVstsSchedulingEffort = "Microsoft.VSTS.Scheduling.Effort";
 		private const string microsoftVstsCommonBacklogpriority = "Microsoft.VSTS.Common.BacklogPriority";
 
-		#region ITemplateMapper Members
-
-		public bool CopyAttributes(Story pivotalstorySource, WorkItem destinationWorkItem)
+        public bool CopyAttributes(Story pivotalstorySource, WorkItem destinationWorkItem)
 		{
 			destinationWorkItem.Fields[microsoftVstsSchedulingEffort].Value = pivotalstorySource.Estimate;
 			destinationWorkItem.Fields[microsoftVstsCommonBacklogpriority].Value = pivotalstorySource.Priority;
@@ -21,7 +19,5 @@ namespace TFS_API.TFS.Templates
 		{
 			return "Microsoft Visual Studio Scrum 1.0";
 		}
-
-		#endregion
 	}
 }

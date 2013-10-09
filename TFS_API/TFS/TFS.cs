@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
@@ -12,9 +10,7 @@ namespace TFS_API.TFS
 	public class TFS : ITFS
 	{
 		private const string Pivotalid = "PIVOTALID:";
-		private const string ProductBacklogItem = "Product Backlog Item";
-		private const string HistoryField = "History";
-		private readonly WorkItemStore store;
+	    private readonly WorkItemStore store;
 
 		public TFS(string servername, string domain, string username, string password)
 		{
@@ -78,73 +74,6 @@ namespace TFS_API.TFS
 			return false;
 		}
 
-		//void ITFS.AddPivotalStoryToTFS(Story pivotalStoryToAdd, string projectname, string iterationPath, string subPath)
-		//{
-		//    var workItemTypes = store.Projects[projectname].WorkItemTypes;
-
-		//    var existingworkingItem = GetTFSBacklogItemByPivotalId(projectname, iterationPath, subPath,
-		//                                                           pivotalStoryToAdd.Id);
-		//    if (existingworkingItem != null)
-		//    {
-		//        existingworkingItem.Description = string.Concat(pivotalStoryToAdd.URL, Environment.NewLine,
-		//                                                        pivotalStoryToAdd.Description);
-		//        existingworkingItem.Save();
-		//        return;
-		//    }
-
-		//    var workItem = new WorkItem(workItemTypes[ProductBacklogItem]);
-
-		//    if (pivotalStoryToAdd.Type == "bug")
-		//    {
-		//        workItem = new WorkItem(workItemTypes["Bug"]);
-		//    }
-
-		//    workItem.Fields[(string) TFSConstants.ConchangoTeamsystemScrumEstimatedeffort].Value =
-		//        pivotalStoryToAdd.Estimate;
-		//    workItem.Fields[(string) TFSConstants.ConchangoTeamsystemScrumBusinesspriority].Value =
-		//        pivotalStoryToAdd.Priority;
-		//    workItem.Fields[(string) TFSConstants.ConchangoTeamsystemScrumDeliveryorder].Value =
-		//        pivotalStoryToAdd.Priority;
-
-		//    workItem.Description = string.Concat(pivotalStoryToAdd.URL, Environment.NewLine,
-		//                                         pivotalStoryToAdd.Description);
-		//    workItem.Title = pivotalStoryToAdd.Name;
-		//    workItem.IterationPath = string.Concat(projectname, "\\", iterationPath, "\\", subPath);
-		//    workItem.Fields[HistoryField].Value = string.Concat(Pivotalid, pivotalStoryToAdd.Id, ":");
-
-		//    //Add Hyper Link
-		//    //Link most be valid!
-		//    var hp = new Hyperlink(pivotalStoryToAdd.URL) {Comment = "Link to pivotal story."};
-		//    workItem.Links.Add(hp);
-
-		//    //Add Attachment
-		//    //TFS will search for the file, so make sure it exists.
-
-		//    //Attachment a = new Attachment(@"C:\FileToAdd.txt", "Comment....");
-		//    //workItem.Attachments.Add(a);
-
-		//    //Make sure your Work Item is Valid
-		//    //After you finish adding all the wanted values into the Work Item make sure that all fields are Valid and your can save the Work Item, This step is to make sure that you prepare the Work Item Definition for the migration. 
-
-		//    var invalidFields = new ArrayList();
-		//    foreach (Field field in workItem.Fields)
-		//    {
-		//        if (!field.IsValid)
-		//        {
-		//            invalidFields.Add(field);
-		//            Console.WriteLine(Resources.TFS_AddPivotalStoryToTFS_Invalid_Field, field.Name, field.Status);
-		//            Console.WriteLine(Resources.TFS_AddPivotalStoryToTFS_Current_Value, field.Value);
-		//        }
-		//    }
-		//    //There are some Invalid Fields.
-		//    if (invalidFields.Count > 0)
-		//    {
-		//        Console.WriteLine(Resources.TFS_AddPivotalStoryToTFS_Invalid_Bug_Track_ID, invalidFields.ToArray());
-		//        return;
-		//    }
-		//    workItem.Save();
-		//}
-
 		ProjectCollection ITFS.GetProjects()
 		{
 			return store.Projects;
@@ -159,7 +88,6 @@ namespace TFS_API.TFS
 			var workitems = ((ITFS) this).GetWorkItems(projectname, iterationPath, subPath,
 			                                           workItemTypes["Product Backlog Item"],
 			                                           -1);
-			//workitems.SortFields.Add( new SortField( ))
 			if (workitems.Count == 0)
 			{
 				nextPriority = 100;
@@ -170,21 +98,16 @@ namespace TFS_API.TFS
 			var currentItemIndex = workitems.Count - 1;
 			bool foundLastWorkItem = false, foundSecondLastWorkItem = false;
 
-			//DumpAllWorkItems(workitems);
 
 			while (true)
 			{
-				//if (!foundLastWorkItem)
-				//{
 				var lastWorkItem = workitems[currentItemIndex];
 				GetPriorityFieldValue(lastWorkItem, out lastWorkItemStepNumber);
 
 				if (lastWorkItemStepNumber > 0)
 				{
-					//next lastWorkItemStepNumber
 					foundLastWorkItem = true;
 				}
-				//}
 
 				if (!foundSecondLastWorkItem)
 				{
@@ -251,37 +174,7 @@ namespace TFS_API.TFS
 
 		#endregion
 
-		private static void DumpAllWorkItems(IEnumerable workitems)
-		{
-			foreach (var field in from WorkItem item in workitems from Field field in item.Fields select field)
-			{
-				Console.Write(field.Id);
-				Console.Write(@":");
-				Console.Write(field.Name);
-				Console.Write(@":");
-				Console.Write(field.Value);
-				Console.WriteLine(@"---");
-			}
-		}
-
-		private WorkItem GetTFSBacklogItemByPivotalId(string projectname, string iterationPath, string subPath, int id)
-		{
-			var completeiterationpath = string.Concat(projectname, "\\", iterationPath, "\\", subPath);
-			try
-			{
-				return
-					store.Query(
-						string.Format(
-							"SELECT * FROM WorkItems WHERE [System.TeamProject] = '{0}' AND [System.IterationPath]='{1}' AND  [System.History] contains '%{2}{3}:%'",
-							projectname, completeiterationpath, Pivotalid, id))[0];
-			}
-			catch (Exception)
-			{
-			}
-			return null;
-		}
-
-		private static void GetPriorityFieldValue(WorkItem wrk, out int val)
+	    private static void GetPriorityFieldValue(WorkItem wrk, out int val)
 		{
 			const string conchangoTeamsystemScrumBusinesspriority = "Business Priority (Scrum)";
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 using PivotalTFS_GENERAL;
@@ -155,7 +156,9 @@ namespace PIVOTAL_API
 
 			//request.Proxy = WebProxy.GetDefaultProxy();
 
-			var byteArray = Encoding.UTF8.GetBytes(string.Concat("username=", username, "&password=", password));
+            var url = string.Format("username={0}&password={1}", HttpUtility.UrlEncode(username), HttpUtility.UrlEncode(password));
+            
+            var byteArray = Encoding.UTF8.GetBytes(url);
 
 			request.ContentLength = byteArray.Length;
 
