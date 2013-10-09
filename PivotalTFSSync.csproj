@@ -60,26 +60,12 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper">
-      <HintPath>..\..\..\Users\ricred\Downloads\AgileZenNetAPI\AutoMapper.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Http">
-      <HintPath>..\..\..\Users\ricred\Downloads\agilezennetapi-10381 orginal\PrearrangedChaos.AgileZen\PrearrangedChaos.AgileZen.Service\bin\Debug\Microsoft.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Http.Extensions">
-      <HintPath>..\..\..\Users\ricred\Downloads\agilezennetapi-10381 orginal\PrearrangedChaos.AgileZen\PrearrangedChaos.AgileZen.Service\bin\Debug\Microsoft.Http.Extensions.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data.OData">
-      <HintPath>..\..\..\Users\ricred\Downloads\agilezennetapi-10381\PrearrangedChaos.AgileZen\PrearrangedChaos.AgileZen.Service\bin\Debug\System.Data.OData.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Windows.Browser">
-      <HintPath>..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\Silverlight\v4.0\System.Windows.Browser.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
